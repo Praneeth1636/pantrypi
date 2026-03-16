@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} · PantryPi{% endblock %}
+
+{% block content %}
+  <section class="pp-hero">
+    <div class="pp-hero-text">
+      <h1 class="pp-title">{{ recipe.title }}</h1>
+      {% if recipe.description %}
+        <p class="pp-subtitle">{{ recipe.description }}</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="pp-recipe-toolbar">
+    <a class="pp-button-secondary" href="{{ url_for('recipes.list_recipes') }}">Back to recipes</a>
+    <div class="pp-toolbar-spacer"></div>
+    <a class="pp-button-secondary" href="{{ url_for('recipes.edit_recipe', recipe_id=recipe.id) }}">Edit</a>
+    <form method="post" action="{{ url_for('recipes.delete_recipe', recipe_id=recipe.id) }}" onsubmit="return confirm('Delete this recipe?');">
+      <button class="pp-button-danger" type="submit">Delete</button>
+    </form>
+  </section>
+
+  <section class="pp-recipe-layout">
+    <article class="pp-recipe-main">
+      <h2>Instructions</h2>
+      <div class="pp-instructions">
+        {{ recipe.instructions | nl2br }}
+      </div>
+    </article>
+    <aside class="pp-recipe-side">
+      <div class="pp-recipe-stats">
+        {% if recipe.prep_time_min or recipe.cook_time_min %}
+          <div><strong>Time</strong> {{ (recipe.prep_time_min or 0) + (recipe.cook_time_min or 0) }} min</div>
+        {% endif %}
+        {% if recipe.servings %}
+          <div><strong>Serves</strong> {{ recipe.servings }}</div>
+        {% endif %}
+      </div>
+
+      {% if ingredients %}
+        <div class="pp-ingredients">
+          <h3>Ingredients</h3>
+          <ul>
+            {% for ing in ingredients %}
+              <li>
+                {% if ing.quantity %}{{ ing.quantity }}{% endif %}
+                {% if ing.unit %}{{ ing.unit }} {% endif %}
+                {{ ing.name }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if tags %}
+        <div class="pp-tag-row">
+          {% for tag in tags %}
+            <span class="pp-tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </aside>
+  </section>
+{% endblock %}
+

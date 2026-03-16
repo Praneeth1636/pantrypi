@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% if recipe %}
+  {% set page_title = "Edit recipe" %}
+{% else %}
+  {% set page_title = "New recipe" %}
+{% endif %}
+
+{% block title %}{{ page_title }} · PantryPi{% endblock %}
+
+{% block content %}
+  <section class="pp-hero">
+    <div class="pp-hero-text">
+      <h1 class="pp-title">{{ page_title }}</h1>
+      <p class="pp-subtitle">Keep it simple and honest — just like your cooking.</p>
+    </div>
+  </section>
+
+  <section class="pp-form-shell">
+    {% if error %}
+      <div class="pp-form-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" class="pp-form">
+      <div class="pp-form-grid">
+        <label>
+          <span>Title</span>
+          <input name="title" required value="{{ (recipe.title if recipe else '') }}">
+        </label>
+
+        <label>
+          <span>Description</span>
+          <input name="description" value="{{ (recipe.description if recipe else '') }}">
+        </label>
+
+        <label>
+          <span>Prep time (min)</span>
+          <input name="prep_time_min" type="number" min="0" value="{{ (recipe.prep_time_min if recipe and recipe.prep_time_min is not none else '') }}">
+        </label>
+
+        <label>
+          <span>Cook time (min)</span>
+          <input name="cook_time_min" type="number" min="0" value="{{ (recipe.cook_time_min if recipe and recipe.cook_time_min is not none else '') }}">
+        </label>
+
+        <label>
+          <span>Servings</span>
+          <input name="servings" type="number" min="1" value="{{ (recipe.servings if recipe and recipe.servings is not none else 4) }}">
+        </label>
+
+        <label>
+          <span>Tags (comma separated)</span>
+          <input name="tags" value="{{ tags_csv or '' }}">
+        </label>
+      </div>
+
+      <label class="pp-form-block">
+        <span>Ingredients</span>
+        <div class="pp-ingredients-editor" data-ingredients-root>
+          {% set rows = ingredients if ingredients else [None, None, None] %}
+          {% for ing in rows %}
+            <div class="pp-ingredient-row">
+              <input name="ingredient_quantity" type="number" step="0.01" placeholder="Qty" value="{{ (ing.quantity if ing else '') }}">
+              <input name="ingredient_unit" placeholder="Unit" value="{{ (ing.unit if ing else '') }}">
+              <input name="ingredient_name" placeholder="Ingredient" value="{{ (ing.name if ing else '') }}" style="flex: 1;">
+              <input name="ingredient_category" placeholder="Category" value="{{ (ing.category if ing else '') }}">
+            </div>
+          {% endfor %}
+          <button type="button" class="pp-button-secondary" data-add-ingredient>Add ingredient</button>
+        </div>
+      </label>
+
+      <label class="pp-form-block">
+        <span>Instructions</span>
+        <textarea name="instructions" rows="10" required>{{ (recipe.instructions if recipe else '') }}</textarea>
+      </label>
+
+      <div class="pp-form-actions">
+        <a class="pp-button-secondary" href="{{ url_for('recipes.list_recipes') }}">Cancel</a>
+        <button class="pp-button" type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

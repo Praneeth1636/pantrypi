@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}PantryPi · Recipes{% endblock %}
+
+{% block content %}
+  <section class="pp-hero">
+    <div class="pp-hero-text">
+      <h1 class="pp-title">PantryPi</h1>
+      <p class="pp-subtitle">Local-first recipes, weekly planning, and grocery lists — designed for your kitchen, not the cloud.</p>
+    </div>
+  </section>
+  {% include "recipes/list.html" %}
+{% endblock %}
+

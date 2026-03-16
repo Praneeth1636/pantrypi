@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}PantryPi{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body class="pp-body">
+    <header class="pp-shell">
+      <div class="pp-shell-inner">
+        <a href="{{ url_for('index') }}" class="pp-logo">Pantry<span>Pi</span></a>
+        <nav class="pp-nav">
+          <a href="{{ url_for('index') }}">Recipes</a>
+          <a href="{{ url_for('planner.planner_home') }}">Planner</a>
+          <a href="{{ url_for('grocery.grocery_home') }}">Grocery</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="pp-main">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
+
