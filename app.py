@@ -2,6 +2,7 @@ from pathlib import Path
 import sqlite3
 
 from flask import Flask, g, render_template
+from markupsafe import Markup, escape
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -29,6 +30,12 @@ def init_db():
     db.commit()
 
 
+def nl2br_filter(value):
+    if not value:
+        return ""
+    return Markup(escape(value).replace("\n", Markup("<br>\n")))
+
+
 def create_app():
     app = Flask(
         __name__,
@@ -37,6 +44,8 @@ def create_app():
         template_folder="templates",
     )
     app.config.from_mapping(SECRET_KEY="change-me")
+
+    app.jinja_env.filters["nl2br"] = nl2br_filter
 
     app.teardown_appcontext(close_db)
 
