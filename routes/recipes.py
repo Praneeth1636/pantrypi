@@ -8,23 +8,45 @@ bp = Blueprint("recipes", __name__, url_prefix="/recipes")
 @bp.route("/")
 def list_recipes():
     db = get_db()
-    recipes = db.execute(
-        """
-        SELECT r.id,
-               r.title,
-               r.description,
-               r.prep_time_min,
-               r.cook_time_min,
-               r.servings,
-               GROUP_CONCAT(t.name, ', ') AS tags
-        FROM recipes r
-        LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
-        LEFT JOIN tags t ON t.id = rt.tag_id
-        GROUP BY r.id
-        ORDER BY r.created_at DESC
-        """
-    ).fetchall()
-    return render_template("recipes/list.html", recipes=recipes)
+    q = request.args.get("q", "").strip()
+    if q:
+        recipes = db.execute(
+            """
+            SELECT r.id,
+                   r.title,
+                   r.description,
+                   r.prep_time_min,
+                   r.cook_time_min,
+                   r.servings,
+                   GROUP_CONCAT(t.name, ', ') AS tags
+            FROM recipes r
+            LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
+            LEFT JOIN tags t ON t.id = rt.tag_id
+            WHERE r.title LIKE ? OR r.description LIKE ?
+               OR r.id IN (SELECT recipe_id FROM ingredients WHERE name LIKE ?)
+            GROUP BY r.id
+            ORDER BY r.created_at DESC
+            """,
+            (f"%{q}%", f"%{q}%", f"%{q}%"),
+        ).fetchall()
+    else:
+        recipes = db.execute(
+            """
+            SELECT r.id,
+                   r.title,
+                   r.description,
+                   r.prep_time_min,
+                   r.cook_time_min,
+                   r.servings,
+                   GROUP_CONCAT(t.name, ', ') AS tags
+            FROM recipes r
+            LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
+            LEFT JOIN tags t ON t.id = rt.tag_id
+            GROUP BY r.id
+            ORDER BY r.created_at DESC
+            """
+        ).fetchall()
+    return render_template("recipes/list.html", recipes=recipes, query=q)
 
 
 @bp.route("/<int:recipe_id>")

@@ -13,6 +13,7 @@ SCHEMA_PATH = BASE_DIR / "schema.sql"
 def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(DB_PATH)
+        g.db.execute("PRAGMA foreign_keys = ON")
         g.db.row_factory = sqlite3.Row
     return g.db
 
@@ -66,7 +67,9 @@ def create_app():
 
     @app.route("/")
     def index():
-        return render_template("index.html")
+        from routes.recipes import list_recipes  # reuse query logic
+
+        return list_recipes()
 
     return app
 
